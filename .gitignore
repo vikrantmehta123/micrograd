@@ -1,0 +1,3 @@
+*.svg
+computational_graph
+__pycache__
