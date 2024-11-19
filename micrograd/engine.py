@@ -49,9 +49,9 @@ class Value:
         out._backward = _backward
         return out
     
-    def __pow__(self, other:"Value") -> "Value":
+    def __pow__(self, other) -> "Value":
         assert isinstance(other, (int, float)), "Only supporting int / float powers"
-        out = Value(self.data**other.data, (self, ), f"**{other}")
+        out = Value(self.data**other, (self, ), f"**{other}")
 
         def _backward():
             self.grad += (other * self.data**(other-1)) * out.grad
@@ -100,3 +100,6 @@ class Value:
     
     def __sub__(self, other):
         return self + (-other)
+    
+    def __rsub__(self, other): # other - self
+        return other + (-self)
