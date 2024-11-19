@@ -1,17 +1,29 @@
 from micrograd.engine import Value
 from computational_graph_viz import draw_dot
 
-a = Value(2.0, label='a')
-b = Value(-3.0, label='b')
-c = Value(10.0, label='c')
+x1 = Value(2.0, label='x1')
+x2 = Value(0.0, label='x2')
 
-e = a*b
-e.label = 'e'
+w1 = Value(-3.0, label='w1')
+w2 = Value(1.0, label='w2')
 
-d = e + c
-d.label = 'd'
+b = Value(6.8813735870195432, label='b')
 
-f = Value(-2.0, label='f')
+x1w1 = x1*w1
+x1w1.label = 'x1w1'
 
-L = d * f
-draw_dot(L)
+x2w2 = x2*w2
+x2w2.label = 'x2w2'
+
+x1w1x2w2 = x1w1 + x2w2
+x1w1x2w2.label = 'x1w1x2w2'
+
+n = x1w1x2w2 + b
+n.label = 'n'
+
+o = n.tanh()
+o.label = 'O'
+
+o.backward()
+
+draw_dot(o)

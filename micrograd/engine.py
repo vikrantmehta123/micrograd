@@ -1,29 +1,29 @@
 import math
-import numpy as np
-import matplotlib.pyplot as plt
 
 class Value:
     def __init__(self, data:float, _children=(), _op='', label='') -> None:
         self.data :float = data
         self.grad :float = 0
-        self._backward = self.backward
+        self._backward = lambda: None
         self._op :str = _op
-        self._prev : tuple[Value] = set(_children)
+        self._prev : tuple[Value] = _children
         self.label = label
     
     def backward(self):
-        topo: list[Value] = [ ]
+        topo: list[Value] = []
         visited = set()
 
-        def build_topo(v:Value):
-            if v not in visited:
-                visited.add(v)
-                for child_v in v._prev:
-                    build_topo(child_v)
-                topo.append(v)
-        build_topo(self)
-        self.grad = 1.0
+        def build_topo(v: Value):
+            if v in visited:
+                return
+            visited.add(v)
+            for child_v in v._prev:
+                build_topo(child_v)
+            topo.append(v)
 
+        build_topo(self)
+
+        self.grad = 1.0
         for node in reversed(topo):
             node._backward()
 
@@ -33,8 +33,8 @@ class Value:
         out = Value(self.data + other.data, (self, other), "+") 
 
         def _backward():
-            self.grad += 1.0 * out.grad
-            other.grad += 1.0 * out.grad
+            self.grad += out.grad
+            other.grad += out.grad
 
         out._backward = _backward
         return out
@@ -48,8 +48,8 @@ class Value:
         out = Value(self.data * other.data, (self, other), "*")
 
         def _backward():
-            self.grad += out.data * other.data
-            other.grad += out.data * self.data
+            self.grad += out.grad * other.data
+            other.grad += out.grad * self.data
         
         out._backward = _backward
         return out
